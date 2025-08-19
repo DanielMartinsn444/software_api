@@ -1,35 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>--Home--</title>
+    <title>Home</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Senny: Bem-Vindo!</h1>
-    <p>No que posso ser útil?</p>
-    
-    <div class="menu">
-        <label for="clima-input">Cidade (Clima):</label>
-        <input type="text" id="clima-input" placeholder="Ex: Belo Horizonte">
-        <button onclick="enviarComando('clima', 'clima-input')">Ver Clima</button>
-        <br><br>
+  <div class="nav-container">
+    <nav class="nav">
+        <p>aqui vai ficar o menu</p>
+    </nav>
+</div>
+    <div class="container-fluid mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center">Senny</h1>
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <div class="mb-3">
+                            <label for="clima-input" class="form-label">☁Clima☁</label>
+                            <input type="text" id="clima-input" class="form-control" placeholder="Ex: Belo Horizonte">
+                            <button onclick="enviarComando('clima', 'clima-input')" class="btn btn-primary mt-2">☁Ver Clima☁</button>
+                        </div>
 
-        <label for="cotacao-input">Par de Moeda:</label>
-        <input type="text" id="cotacao-input" placeholder="Ex: EUR-BRL">
-        <button onclick="enviarComando('cotacao', 'cotacao-input')">Ver Cotação</button>
+                        <div class="mb-3">
+                            <label for="cotacao-input" class="form-label">💵Cotação💵</label>
+                            <input type="text" id="cotacao-input" class="form-control" placeholder="Ex: EUR-BRL">
+                            <button onclick="enviarComando('cotacao', 'cotacao-input')" class="btn btn-secondary mt-2">💵Ver Cotação💵</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-10">
+                        <div id="resposta-api" class="card p-3 fade-in"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <h3>Senny:</h3>
-    <div id="resposta-api"></div>
-
+    
     <script>
     async function enviarComando(cmd, inputId) {
         const apiDiv = document.getElementById('resposta-api');
+        apiDiv.classList.remove('fade-in');
         apiDiv.innerHTML = 'Carregando...';
 
         const inputElement = document.getElementById(inputId);
         const valorInput = inputElement ? inputElement.value : '';
-
-        
         const valorCodificado = encodeURIComponent(valorInput);
 
         let url = `/api/?cmd=${cmd}`;
@@ -37,8 +58,6 @@
         if (valorCodificado) {
             if (cmd === 'clima') {
                 url += `&cidade=${valorCodificado}`;
-            } else if (cmd === 'fuso-horario') {
-                url += `&regiao=America&cidade=${valorCodificado}`;
             } else if (cmd === 'cotacao') {
                 url += `&par=${valorCodificado}`;
             }
@@ -49,19 +68,146 @@
             const data = await response.json();
 
             if (response.ok) {
-                apiDiv.innerText = JSON.stringify(data, null, 2);
+                if (cmd === 'clima') {
+                    const fusoHorario = data.fuso_horario;
+                    let fusoHorarioHTML = '';
+                    if (fusoHorario && fusoHorario.zona) {
+                        fusoHorarioHTML = `
+                            <hr class="my-3">
+                            <h5 class="card-subtitle mb-2 text-muted">Fuso-Horário</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Zona:</strong> ${fusoHorario.zona}</li>
+                                <li class="list-group-item"><strong>Horário:</strong> ${fusoHorario.horario}</li>
+                                <li class="list-group-item"><strong>Abreviação:</strong> ${fusoHorario.abrev}</li>
+                            </ul>
+                        `;
+                    } else if (fusoHorario && fusoHorario.erro) {
+                        fusoHorarioHTML = `<p class="text-danger mt-3"><strong>Erro:</strong> ${fusoHorario.erro}</p>`;
+                    }
+                    
+                    apiDiv.innerHTML = `
+                        <div class="card-body">
+                            <h3 class="card-title">${data.cidade}, ${data.pais}</h3>
+                            <h4 class="card-subtitle mb-2 text-muted">Clima</h4>
+                            <p class="card-text mb-1"><strong>Temperatura:</strong> ${data.temperatura}°C</p>
+                            <p class="card-text mb-1"><strong>Condição:</strong> ${data.condicao}</p>
+                            ${fusoHorarioHTML}
+                        </div>
+                    `;
+                } else if (cmd === 'cotacao') {
+                    apiDiv.innerHTML = `
+                        <div class="card-body">
+                            <h3 class="card-title">${data.par_moedas}</h3>
+                            <h4 class="card-subtitle mb-2 text-muted">${data.nome}</h4>
+                            <p class="card-text mb-1"><strong>Valor de Compra:</strong> ${data.valor_compra}</p>
+                            <p class="card-text mb-1"><strong>Valor de Venda:</strong> ${data.valor_venda}</p>
+                            <p class="card-text mt-3 text-muted"><small>Atualizado em: ${data.data_criacao}</small></p>
+                        </div>
+                    `;
+                }
             } else {
-                apiDiv.innerText = `Erro: ${data.Erro}`;
+                const mensagemDeErro = data.Erro || data.erro || 'Ocorreu um erro desconhecido.';
+                apiDiv.innerText = `Erro: ${mensagemDeErro}`;
             }
         } catch (error) {
             apiDiv.innerText = 'Erro ao se comunicar com a API.';
         }
+        
+        apiDiv.classList.add('fade-in');
     }
-</script>
-    <footer>    
+    
+    
+    async function fetchAndDisplayLocationData(lat, lon) {
+        const apiDiv = document.getElementById('resposta-api');
+        
+        
+        apiDiv.innerHTML = 'Carregando dados da sua localização...';
+
+        try {
+            const url = `/api/location/?lat=${lat}&lon=${lon}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                const clima = data.clima;
+                const cotacao = data.cotacao;
+                let contentHTML = '';
+
+                
+                const climaOk = clima && !clima.erro;
+                const cotacaoOk = cotacao && !cotacao.erro;
+
+                if (climaOk) {
+                    contentHTML += `
+                        <div class="card-body">
+                            <h5>Clima na sua região</h5>
+                            <hr>
+                            <p><strong>Cidade:</strong> ${clima.cidade}</p>
+                            <p><strong>Temperatura:</strong> ${clima.temperatura}°C</p>
+                            <p><strong>Condição:</strong> ${clima.condicao}</p>
+                        </div>
+                    `;
+                }
+
+                if (cotacaoOk) {
+                   
+                    if (climaOk) {
+                        contentHTML += '<hr>';
+                    }
+                    contentHTML += `
+                        <div class="card-body">
+                            <h5>Cotação Local</h5>
+                            <hr>
+                            <p><strong>Par de Moedas:</strong> ${cotacao.par_moedas}</p>
+                            <p><strong>Compra:</strong> ${cotacao.valor_compra}</p>
+                            <p><strong>Venda:</strong> ${cotacao.valor_venda}</p>
+                        </div>
+                    `;
+                }
+
+                if (contentHTML) {
+                    apiDiv.innerHTML = contentHTML;
+                } else {
+                    apiDiv.innerHTML = `<p class="text-danger">Não foi possível carregar os dados de sua localização.</p>`;
+                }
+
+            } else {
+                const mensagemDeErro = data.Erro || data.erro || 'Ocorreu um erro desconhecido.';
+                apiDiv.innerHTML = `<p class="text-danger">Erro da API: ${mensagemDeErro}</p>`;
+            }
+        } catch (error) {
+            console.error("Erro ao buscar dados de localização:", error);
+            apiDiv.innerHTML = `<p class="text-danger">Erro ao conectar com o servidor.</p>`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    fetchAndDisplayLocationData(lat, lon);
+                    
+                    setInterval(() => fetchAndDisplayLocationData(lat, lon), 600000);
+                },
+                (error) => {
+                    console.error("Erro ao obter a localização: ", error);
+                    document.getElementById('resposta-api').innerHTML = `<p class="text-danger">Não foi possível obter a sua localização.</p>`;
+                }
+            );
+        } else {
+            console.log("Geolocalização não é suportada neste navegador.");
+            document.getElementById('resposta-api').innerHTML = `<p class="text-danger">Geolocalização não suportada neste navegador.</p>`;
+        }
+    });
+    </script>
+    
+    <footer>    
         <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
-        <button type="submit">Sair</button>
+        <button type="submit" class="btn btn-danger">Sair</button>
         </form>
     </footer>
 </body>

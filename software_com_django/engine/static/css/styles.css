@@ -1,0 +1,116 @@
+:root {
+  --cor-fundo: #212121;
+  --cor-primaria: #0A0A5F;
+  --cor-secundaria: #B0BEC5;
+  --cor-texto: #7dc0df;
+  --cor-borda: #424242;
+  --cor-destaque: #00bcd4;
+  --cor-alerta: #FF5252;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 2px solid #e5ff00; 
+}
+
+body {
+    background-color: var(--cor-fundo);
+    background-image: url("https://i.pinimg.com/736x/38/61/a2/3861a23e5df3b945e2fc69cd593284d8.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    color: var(--cor-texto);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.container {
+    background-color: rgba(33, 33, 33, 0.8);
+    border-radius: 10px;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.card {
+    background-color: rgba(42, 42, 42, 0.6);
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+}
+
+#card-clima-local,
+#card-cotacao-local {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.text-center {
+    color: var(--cor-texto);
+    text-shadow: 2px 2px 4px var(--cor-borda);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.mb-3 {
+    color: var(--cor-texto);
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadein 0.8s ease-out;
+}
+
+.btn.btn-primary.mt-2,
+.btn.btn-secondary.mt-2 {
+    background-color: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+    color: var(--cor-texto);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn.btn-primary.mt-2:hover,
+.btn.btn-secondary.mt-2:hover {
+    background-color: var(--cor-destaque);
+    border-color: var(--cor-destaque);
+}
+
+.btn.btn-danger {
+    background-color: var(--cor-alerta);
+    border-color: var(--cor-alerta);
+    color: var(--cor-texto);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#resposta-api {
+    background-image:  rgba(255, 0, 0, 0.6);
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: var(--cor-texto);
+    min-height: 150px;
+    transition: all 0.5s ease-in-out;
+}
+
+#resposta-api p {
+    margin: 5px 0;
+}
+
+#resposta-api h3 {
+    color: var(--cor-primaria);
+    font-size: 1.5rem;
+}
+
+.hidden {
+    display: none;
+}

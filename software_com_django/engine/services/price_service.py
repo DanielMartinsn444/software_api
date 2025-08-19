@@ -27,3 +27,6 @@ def get_price(currency_pair):
         return {
             "Erro": f"Par de moedas '{currency_pair}' não encontrado ou formato inválido na resposta."
         }
+
+def get_price_by_coords(lat, lon):
+    return get_price("EUR-BRL")

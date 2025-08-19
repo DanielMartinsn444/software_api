@@ -92,3 +92,29 @@ def senny_brain(request):
             return Response(price_service.get_price(currency_pair))
         case _:
             return Response({"Erro": "Comando inválido"}, status=400)
+
+
+@api_view(["GET"])
+def location_data(request):
+    if "user_id" not in request.session:
+        return Response(
+            {"Erro": "Você precisa estar logado para usar este comando."}, status=403
+        )
+
+    latitude = request.query_params.get("lat")
+    longitude = request.query_params.get("lon")
+
+    if not latitude or not longitude:
+        return Response({"Erro": "Latitude e longitude são obrigatórias."}, status=400)
+
+    try:
+        
+        clima_data = weather_service.get_weather_by_coords(latitude, longitude)
+        cotacao_data = price_service.get_price_by_coords(latitude, longitude)
+
+        return Response({
+            "clima": clima_data,
+            "cotacao": cotacao_data
+        })
+    except Exception as e:
+        return Response({"Erro": str(e)}, status=500)
