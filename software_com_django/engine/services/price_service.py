@@ -27,10 +27,3 @@ def get_price(currency_pair):
         return {
             "Erro": f"Par de moedas '{currency_pair}' não encontrado ou formato inválido na resposta."
         }
-
-
-cotacao = get_price("USD-BRL")
-print(cotacao)
-
-cotacao_euro = get_price("EUR-BRL")
-print(cotacao_euro)

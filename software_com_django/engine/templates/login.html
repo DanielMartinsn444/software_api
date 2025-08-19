@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Entrar</h2>
+    
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Nome de usuário">
+        <br>
+        <input type="password" name="password" placeholder="Senha">
+        <br>
+        <button type="submit">Entrar</button>
+    </form>
+     <h2>Não tem uma conta?</h2>
+    <p>Não tem uma conta? <a href="{% url 'signup' %}">Cadastre-se aqui</a>.</p>
+</body>
+</html>

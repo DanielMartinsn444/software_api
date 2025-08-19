@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>--Home--</title>
+</head>
+<body>
+    <h1>Senny: Bem-Vindo!</h1>
+    <p>No que posso ser útil?</p>
+    
+    <div class="menu">
+        <label for="clima-input">Cidade (Clima):</label>
+        <input type="text" id="clima-input" placeholder="Ex: Belo Horizonte">
+        <button onclick="enviarComando('clima', 'clima-input')">Ver Clima</button>
+        <br><br>
+
+        <label for="cotacao-input">Par de Moeda:</label>
+        <input type="text" id="cotacao-input" placeholder="Ex: EUR-BRL">
+        <button onclick="enviarComando('cotacao', 'cotacao-input')">Ver Cotação</button>
+    </div>
+
+    <h3>Senny:</h3>
+    <div id="resposta-api"></div>
+
+    <script>
+    async function enviarComando(cmd, inputId) {
+        const apiDiv = document.getElementById('resposta-api');
+        apiDiv.innerHTML = 'Carregando...';
+
+        const inputElement = document.getElementById(inputId);
+        const valorInput = inputElement ? inputElement.value : '';
+
+        
+        const valorCodificado = encodeURIComponent(valorInput);
+
+        let url = `/api/?cmd=${cmd}`;
+
+        if (valorCodificado) {
+            if (cmd === 'clima') {
+                url += `&cidade=${valorCodificado}`;
+            } else if (cmd === 'fuso-horario') {
+                url += `&regiao=America&cidade=${valorCodificado}`;
+            } else if (cmd === 'cotacao') {
+                url += `&par=${valorCodificado}`;
+            }
+        }
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                apiDiv.innerText = JSON.stringify(data, null, 2);
+            } else {
+                apiDiv.innerText = `Erro: ${data.Erro}`;
+            }
+        } catch (error) {
+            apiDiv.innerText = 'Erro ao se comunicar com a API.';
+        }
+    }
+</script>
+    <footer>    
+        <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Sair</button>
+        </form>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastro de Usuário</title>
+</head>
+<body>
+    <h2>Crie sua conta</h2>
+    <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Nome de usuário">
+        <input type="password" name="password" placeholder="Senha">
+        <input type="email" name="email" placeholder="E-mail">
+        <button type="submit">Cadastrar</button>
+    </form>
+    <h2>Já tem uma conta?</h2>
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>

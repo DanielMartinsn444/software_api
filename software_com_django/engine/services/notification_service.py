@@ -24,9 +24,3 @@ def get_notification(title, body):
         return r.json()
     except requests.exceptions.RequestException as e:
         return {"erro": f"erro ao enviar notificação: {e}"}
-
-
-mensagem = get_notification("Senny", "No que posso ser útil?")
-
-print(mensagem)
-
